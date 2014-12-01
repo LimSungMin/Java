@@ -1,6 +1,6 @@
 Java projects
 ==============
-private java repository(but opened public)
+∞¿¿¿∑ ¿º« 
 --------------
 - First updated at 11/18/2014
 - there are only school homeworks..

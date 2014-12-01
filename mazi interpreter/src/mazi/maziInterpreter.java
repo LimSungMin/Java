@@ -24,14 +24,18 @@ public class maziInterpreter {
 		while (scanner.hasNext()) {
 			String line = scanner.nextLine();
 			StringTokenizer stz = new StringTokenizer(line);
-			// double result = evalExpr(env, 0, "+", stz);
-			// System.out.println("Evalute " + line + " to " + result);
-			evalStmt(env, stz);
+			try{
+				evalStmt(env, stz);
+			} catch (MaziException x){
+				System.err.println(x);
+			} catch (RuntimeException e){
+				System.err.println("Exception reason : "+e);
+			}
 		}
 
 	}
 
-	public static void evalStmt(HashMap<String, Double> env, StringTokenizer stz) {
+	public static void evalStmt(HashMap<String, Double> env, StringTokenizer stz) throws MaziException {
 
 		String word = stz.nextToken();
 		double result;
@@ -47,39 +51,40 @@ public class maziInterpreter {
 				System.out.println("변수를 넣었습니다.");
 			}
 		} else if (word.equals("IF")) {
-			// TO DO
-			// 아마 >,< 의 우선순위도 넣어줘야 할거같음. 그리고 아래와같이 하지 말고, THEN 과 ELSE
-			// 가 나올때까지 스트링을 넣어준다음에 토크나이징 해야할거같음
+
 			String conditional = "";
-			while(true){
+			while (true) {
 				word = stz.nextToken();
-				if(word.equals("THEN")) break;
-				conditional += (word+" ");
+				if (word.equals("THEN"))
+					break;
+				conditional += (word + " ");
 			}
 			StringTokenizer conditionStz = new StringTokenizer(conditional);
 			double rBool = evalExpr(env, 0, "+", conditionStz);
-			//System.out.println(rBool);
+			// System.out.println(rBool);
 			conditional = "";
-			if(rBool == 1){
-				while(true){
+			if (rBool == 1) {
+				while (true) {
 					word = stz.nextToken();
-					if(word.equals("ELSE")) break;
-					conditional += (word+" ");
+					if (word.equals("ELSE"))
+						break;
+					conditional += (word + " ");
 				}
 				conditionStz = new StringTokenizer(conditional);
-				//System.out.println(conditional);
+				// System.out.println(conditional);
 				evalStmt(env, conditionStz);
-			}else{
-				while(true){
+			} else {
+				while (true) {
 					word = stz.nextToken();
-					if(word.equals("ELSE")) break;
+					if (word.equals("ELSE"))
+						break;
 				}
-				while(stz.hasMoreTokens()){
+				while (stz.hasMoreTokens()) {
 					word = stz.nextToken();
-					conditional += (word+" ");
+					conditional += (word + " ");
 				}
 				conditionStz = new StringTokenizer(conditional);
-				//System.out.println(conditional);
+				// System.out.println(conditional);
 				evalStmt(env, conditionStz);
 			}
 		} else if (Character.isLetter(word.charAt(0))) {
@@ -101,12 +106,12 @@ public class maziInterpreter {
 	}
 
 	public static double evalExpr(HashMap<String, Double> env, double operand1,
-			String operator1, StringTokenizer stz) {
+			String operator1, StringTokenizer stz) throws MaziException {
 		double result = 0;
 
 		// (1)
 		if (stz.countTokens() == 0) {
-			System.err.println("Tokens not available.");
+			throw new MaziException("Tokens not available.");
 		}
 		// (2)
 		else if (stz.countTokens() == 1) {
@@ -150,7 +155,8 @@ public class maziInterpreter {
 		else {
 			System.err.println("Something wrong:");
 			while (stz.hasMoreTokens()) {
-				System.err.print(stz.nextToken() + " ");
+				throw new MaziException(stz.nextToken() + " ");
+				//System.err.print(stz.nextToken() + " ");
 			}
 			System.err.println();
 		}
@@ -158,13 +164,14 @@ public class maziInterpreter {
 		return result;
 	}
 
-	public static double evalOperand(HashMap<String, Double> env, String operand) {
+	public static double evalOperand(HashMap<String, Double> env, String operand) throws MaziException {
 		double result = 0;
 
 		if (Character.isLetter(operand.charAt(0))) { // operand is a variable
 			Double d = env.get(operand);
 			if (d == null) {
-				System.err.println("Undefined variable: " + operand);
+				throw new MaziException("Undefined variable: " + operand);
+				//System.err.println("Undefined variable: " + operand);
 			} else {
 				result = d;
 			}
@@ -176,7 +183,7 @@ public class maziInterpreter {
 	}
 
 	public static double evalExpr(double operand1, String operator,
-			double operand2) {
+			double operand2) throws MaziException {
 		double result = 0;
 
 		switch (operator.charAt(0)) {
@@ -214,7 +221,8 @@ public class maziInterpreter {
 			}
 			break;
 		default:
-			System.err.println("Unsupported operator: " + operator);
+			throw new MaziException("Unsupported operator: " + operator);
+			//System.err.println("Unsupported operator: " + operator);
 		}
 
 		return result;
